@@ -1,0 +1,6 @@
+GET http://localhost:8080/restavote/restaurants
+Accept: application/json
+
+### or
+GET http://localhost:8080/restavote/restaurants/1/menuOfDay
+Accept: application/json
