@@ -3,18 +3,19 @@ package ru.viterg.restavote.util;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 public class DateTimeUtil {
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    public static final String            DATE_TIME_PATTERN   = "yyyy-MM-dd HH:mm";
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
+    public static final  LocalTime     LAST_VOTE_TIME = LocalTime.of(11, 0);
     // DB doesn't support LocalDate.MIN/MAX
-    private static final LocalDateTime MIN_DATE = LocalDateTime.of(1, 1, 1, 0, 0);
-    private static final LocalDateTime MAX_DATE = LocalDateTime.of(3000, 1, 1, 0, 0);
+    private static final LocalDateTime MIN_DATE       = LocalDateTime.of(1, 1, 1, 0, 0);
+    private static final LocalDateTime MAX_DATE       = LocalDateTime.of(3000, 1, 1, 0, 0);
+
 
     private DateTimeUtil() {
     }
@@ -31,11 +32,13 @@ public class DateTimeUtil {
         return ldt == null ? "" : ldt.format(DATE_TIME_FORMATTER);
     }
 
-    public static @Nullable LocalDate parseLocalDate(@Nullable String str) {
-        return !StringUtils.hasText(str) ? null : LocalDate.parse(str);
+    @Nullable
+    public static LocalDate parseLocalDate(@Nullable String str) {
+        return StringUtils.hasText(str) ? LocalDate.parse(str) : null;
     }
 
-    public static @Nullable LocalTime parseLocalTime(@Nullable String str) {
-        return !StringUtils.hasText(str) ? null : LocalTime.parse(str);
+    @Nullable
+    public static LocalTime parseLocalTime(@Nullable String str) {
+        return StringUtils.hasText(str) ? LocalTime.parse(str) : null;
     }
 }

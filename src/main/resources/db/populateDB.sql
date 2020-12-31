@@ -5,23 +5,31 @@ DELETE FROM user_roles;
 DELETE FROM users;
 ALTER SEQUENCE global_seq RESTART WITH 100;
 
-INSERT INTO users (name, email, password)
-VALUES ('Admin', 'admin@gmail.com', 'admin'),
-       ('User', 'user@yandex.ru', 'password');
+INSERT INTO USERS (name, email, password)
+VALUES ('Admin', 'admin@gmail.com', '{noop}admin'),
+       ('User1', 'user1@yandex.ru', '{noop}password'),
+       ('User2', 'user2@yandex.ru', '{noop}wordpass');
 
-INSERT INTO user_roles (role, user_id)
+INSERT INTO USER_ROLES (role, user_id)
 VALUES ('ADMIN', 100),
-       ('USER', 101);
+       ('USER', 101),
+       ('USER', 102);
 
 INSERT INTO RESTAURANTS (description)
 VALUES ('Метрополь'),
        ('Пронтера'),
        ('Папа Джонс');
 
-INSERT INTO dishes (date_time, description, price, rest_id)
-VALUES ('2020-01-30 10:00:00', 'Завтрак', 500, 102),
-       ('2020-01-30 13:00:00', 'Обед', 1000, 103),
-       ('2020-01-30 20:00:00', 'Ужин', 500, 104),
-       ('2020-01-31 10:00:00', 'Завтрак', 500, 102),
-       ('2020-01-31 13:00:00', 'Обед', 1000, 103),
-       ('2020-01-31 20:00:00', 'Ужин', 510, 104);
+INSERT INTO DISHES (day_value, description, price, rest_id)
+VALUES ('2020-01-30', 'Завтрак', 500, 103),
+       ('2020-01-30', 'Обед', 1000, 104),
+       ('2020-01-30', 'Ужин', 500, 105),
+       ('2020-01-31', 'Завтрак', 500, 103),
+       ('2020-01-31', 'Обед', 1000, 104),
+       ('2020-01-31', 'Ужин', 510, 105);
+
+INSERT INTO VOTES(user_id, vote_date, rest_id)
+VALUES (101, '2020-06-12', 105),
+       (102, '2020-06-12', 103),
+       (101, '2020-07-12', 104),
+       (102, '2020-07-12', 105);

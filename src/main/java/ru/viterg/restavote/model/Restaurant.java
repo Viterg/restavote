@@ -14,9 +14,20 @@ public class Restaurant extends AbstractBaseEntity {
     @Size(min = 1, max = 255)
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant")//, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @OrderBy("dateTime DESC")
+    @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY)//, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OrderBy("day DESC")
     private Set<Dish> dishes;
+
+    // @CollectionTable(name = "votes", joinColumns = @JoinColumn(name = "REST_ID"),
+    //                  uniqueConstraints = @UniqueConstraint(columnNames = {"USER_ID", "vote_date"}, name = "user_vote_idx"))
+    // @MapKeyJoinColumn(name = "USER_ID")
+    // @Column(name = "vote_date")
+    // @ElementCollection(fetch = FetchType.EAGER)
+    // @BatchSize(size = 200)
+    // private Map<User, LocalDate> votes;
+
+    @OneToMany(mappedBy = "restaurant", fetch = FetchType.EAGER)
+    private Set<Vote> votes;
 
     public Restaurant() {
     }
@@ -36,6 +47,22 @@ public class Restaurant extends AbstractBaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Set<Dish> getDishes() {
+        return dishes;
+    }
+
+    public void setDishes(Set<Dish> dishes) {
+        this.dishes = dishes;
+    }
+
+    public Set<Vote> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Set<Vote> votes) {
+        this.votes = votes;
     }
 
     @Override

@@ -1,8 +1,12 @@
 package ru.viterg.restavote.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.*;
+import org.hibernate.validator.constraints.SafeHtml;
 import org.springframework.util.CollectionUtils;
+import ru.viterg.restavote.HasIdAndEmail;
+import ru.viterg.restavote.View;
 
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
@@ -12,33 +16,33 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.util.*;
 
+import static org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE;
+
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @NamedQueries({
-    @NamedQuery(name = User.DELETE, query = "DELETE FROM User u WHERE u.id=:id"),
-    @NamedQuery(name = User.BY_EMAIL, query = "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email=?1"),
-    @NamedQuery(name = User.ALL_SORTED, query = "SELECT DISTINCT u FROM User u ORDER BY u.name, u.email"),
+      @NamedQuery(name = User.DELETE, query = "DELETE FROM User u WHERE u.id=:id"),
+      @NamedQuery(name = User.BY_EMAIL, query = "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email=?1"),
+      @NamedQuery(name = User.ALL_SORTED, query = "SELECT u FROM User u ORDER BY u.name, u.email"),
 })
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email", name = "users_unique_email_idx")})
-public class User extends AbstractBaseEntity {
+public class User extends AbstractNamedEntity implements HasIdAndEmail {
+
     public static final String DELETE     = "User.delete";
     public static final String BY_EMAIL   = "User.getByEmail";
     public static final String ALL_SORTED = "User.getAllSorted";
-
-    @NotBlank
-    @Size(min = 2, max = 100)
-    @Column(name = "name", nullable = false)
-    protected String name;
 
     @Column(name = "email", nullable = false, unique = true)
     @Email
     @NotBlank
     @Size(max = 100)
+    @SafeHtml(groups = {View.Web.class}, whitelistType = NONE)
     private String email;
 
     @Column(name = "password", nullable = false)
     @NotBlank
     @Size(min = 5, max = 100)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(name = "enabled", nullable = false, columnDefinition = "bool default true")
@@ -46,15 +50,16 @@ public class User extends AbstractBaseEntity {
 
     @Column(name = "registered", nullable = false, columnDefinition = "timestamp default now()")
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date registered = new Date();
 
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"),
-                     uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "role"}, name = "user_roles_unique_idx")})
+                     uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "role"},
+                                                           name = "user_roles_unique_idx"))
     @Column(name = "role")
     @ElementCollection(fetch = FetchType.EAGER)
-    //    @Fetch(FetchMode.SUBSELECT)
     @BatchSize(size = 200)
     private Set<Role> roles;
 
@@ -71,8 +76,7 @@ public class User extends AbstractBaseEntity {
 
     public User(Integer id, String name, String email, String password, boolean enabled, Date registered,
                 Collection<Role> roles) {
-        super(id);
-        this.name = name;
+        super(id, name);
         this.email = email;
         this.password = password;
         this.enabled = enabled;
@@ -80,24 +84,13 @@ public class User extends AbstractBaseEntity {
         setRoles(roles);
     }
 
+    @Override
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {
@@ -112,16 +105,20 @@ public class User extends AbstractBaseEntity {
         this.registered = registered;
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     public Set<Role> getRoles() {
         return roles;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public void setRoles(Collection<Role> roles) {

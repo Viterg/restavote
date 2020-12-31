@@ -8,23 +8,23 @@ import javax.validation.constraints.*;
 import java.time.*;
 
 @NamedQueries({
-    @NamedQuery(name = Dish.ALL_SORTED, query = "SELECT d FROM Dish d WHERE d.restaurant.id=:restId ORDER BY d.dateTime DESC"),
+    @NamedQuery(name = Dish.ALL_SORTED, query = "SELECT d FROM Dish d WHERE d.restaurant.id=:restId ORDER BY d.day DESC"),
     @NamedQuery(name = Dish.DELETE, query = "DELETE FROM Dish d WHERE d.id=:id AND d.restaurant.id=:restId"),
     @NamedQuery(name = Dish.GET_BETWEEN, query = """
-                            SELECT d FROM Dish d WHERE d.restaurant.id=:restId AND d.dateTime >= :startDateTime
-                            AND d.dateTime < :endDateTime ORDER BY d.dateTime DESC"""),
+                            SELECT d FROM Dish d WHERE d.restaurant.id=:restId AND d.day >= :startDateTime
+                            AND d.day < :endDateTime ORDER BY d.day DESC"""),
               })
 @Entity
-@Table(name = "dishes", uniqueConstraints = @UniqueConstraint(columnNames = {"rest_id", "date_time"},
+@Table(name = "dishes", uniqueConstraints = @UniqueConstraint(columnNames = {"rest_id", "day_value"},
                                                               name = "meals_unique_rest_datetime_idx"))
 public class Dish extends AbstractBaseEntity {
     public static final String ALL_SORTED  = "Dish.getAll";
     public static final String DELETE      = "Dish.delete";
     public static final String GET_BETWEEN = "Dish.getBetween";
 
-    @Column(name = "date_time", nullable = false)
+    @Column(name = "day_value", nullable = false)
     @NotNull
-    private LocalDateTime dateTime;
+    private LocalDate day;
 
     @Column(name = "description", nullable = false)
     @NotBlank
@@ -33,7 +33,7 @@ public class Dish extends AbstractBaseEntity {
 
     @Column(name = "price", nullable = false)
     @Min(1)
-    private int price;
+    private int price; // in cents
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rest_id", nullable = false)
@@ -43,19 +43,19 @@ public class Dish extends AbstractBaseEntity {
     public Dish() {
     }
 
-    public Dish(LocalDateTime dateTime, String description, int price) {
-        this(null, dateTime, description, price);
+    public Dish(LocalDate day, String description, int price) {
+        this(null, day, description, price);
     }
 
-    public Dish(Integer id, LocalDateTime dateTime, String description, int price) {
+    public Dish(Integer id, LocalDate day, String description, int price) {
         super(id);
-        this.dateTime = dateTime;
+        this.day = day;
         this.description = description;
         this.price = price;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public LocalDate getDay() {
+        return day;
     }
 
     public String getDescription() {
@@ -66,16 +66,8 @@ public class Dish extends AbstractBaseEntity {
         return price;
     }
 
-    public LocalDate getDate() {
-        return dateTime.toLocalDate();
-    }
-
-    public LocalTime getTime() {
-        return dateTime.toLocalTime();
-    }
-
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+    public void setDay(LocalDate day) {
+        this.day = day;
     }
 
     public void setDescription(String description) {
@@ -98,7 +90,7 @@ public class Dish extends AbstractBaseEntity {
     public String toString() {
         return "Dish{" +
                "id=" + id +
-               ", dateTime=" + dateTime +
+               ", day=" + day +
                ", description='" + description + '\'' +
                ", calories=" + price +
                '}';
