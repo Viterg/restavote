@@ -32,7 +32,6 @@ public class DishRepository {
     }
 
     public List<Dish> getAll(int restaurantId) {
-        // return crudDishRepository.getAll(restaurantId);
         return crudDishRepository.getAllByRestaurantId(restaurantId);
     }
 
@@ -52,7 +51,6 @@ public class DishRepository {
     }
 
     public List<Dish> getMenuOfDay(LocalDate day, int restId) {
-        // return crudDishRepository.getMenuOfDay(day, restId);
         return crudDishRepository.getAllByDayAndRestaurantId(day, restId);
     }
 }

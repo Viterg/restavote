@@ -20,7 +20,7 @@ import static ru.viterg.restavote.util.ValidationUtil.*;
 @RestController
 @RequestMapping(value = DishRestController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class DishRestController {
-    public static final  String REST_URL = "/restaurants/";
+    public static final  String REST_URL = "/restaurants/{restId}";
     private static final Logger log      = LoggerFactory.getLogger(DishRestController.class);
 
     private final DishRepository repository;
@@ -29,26 +29,26 @@ public class DishRestController {
         this.repository = repository;
     }
 
-    @GetMapping("/{restId}/dishes/{id}")
+    @GetMapping("/dishes/{id}")
     public Dish get(@PathVariable int id, @PathVariable int restId) {
         log.info("get dish {} for user {}", id, restId);
         return checkNotFoundWithId(repository.get(id, restId), id);
     }
 
-    @DeleteMapping("/{restId}/dishes/{id}")
+    @DeleteMapping("/dishes/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int id, @PathVariable int restId) {
         log.info("delete dish {} for user {}", id, restId);
         checkNotFoundWithId(repository.delete(id, restId), id);
     }
 
-    @GetMapping("/{restId}/dishes")
+    @GetMapping("/dishes")
     public List<DishTo> getAll(@PathVariable int restId) {
         log.info("getAll for user {}", restId);
         return DishesUtil.getTos(repository.getAll(restId));
     }
 
-    @PutMapping(value = "/{restId}/dishes/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/dishes/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@Valid @RequestBody Dish dish, @PathVariable int id,
                        @PathVariable int restId) {
@@ -58,12 +58,12 @@ public class DishRestController {
         checkNotFoundWithId(repository.save(dish, restId), dish.id());
     }
 
-    @PostMapping(value = "/{restId}/dishes", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/dishes", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Dish> createWithLocation(@Valid @RequestBody Dish dish,
                                                    @PathVariable int restId) {
         Dish created = create(dish, restId);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                                                          .path(REST_URL + "/{id}")
+                                                          .path("/restaurants/" + restId + "/{id}")
                                                           .buildAndExpand(created.getId()).toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
     }

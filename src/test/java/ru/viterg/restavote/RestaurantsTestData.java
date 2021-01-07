@@ -12,7 +12,7 @@ import static ru.viterg.restavote.UserTestData.user1;
 import static ru.viterg.restavote.model.AbstractBaseEntity.START_SEQ;
 
 public class RestaurantsTestData {
-    public static final TestMatcher<Restaurant>   RESTAURANT_MATCHER    = TestMatcher.usingIgnoringFieldsComparator(Restaurant.class);
+    public static final TestMatcher<Restaurant>   RESTAURANT_MATCHER    = TestMatcher.usingIgnoringFieldsComparator(Restaurant.class, "dishes", "votes");
     public static final TestMatcher<RestaurantTo> RESTAURANT_TO_MATCHER = TestMatcher.usingEqualsComparator(RestaurantTo.class);
     public static final TestMatcher<Dish>         DISH_MATCHER          = TestMatcher.usingIgnoringFieldsComparator(Dish.class, "restaurant");
     public static final TestMatcher<DishTo>       DISH_TO_MATCHER       = TestMatcher.usingEqualsComparator(DishTo.class);

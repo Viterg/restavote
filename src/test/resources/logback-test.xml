@@ -15,7 +15,7 @@
     <appender name="result" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <charset>UTF-8</charset>
-            <pattern>%orange(%msg%n)</pattern>
+            <pattern>%magenta(%msg%n)</pattern>
         </encoder>
     </appender>
     <logger name="result" level="INFO" additivity="false">

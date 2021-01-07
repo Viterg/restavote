@@ -10,9 +10,6 @@
     <packaging>war</packaging>
     <name>RestaVote</name>
 
-    <!-- FIXME change it to the project's website -->
-    <url>http://www.example.com</url>
-
     <properties>
         <java.version>15</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

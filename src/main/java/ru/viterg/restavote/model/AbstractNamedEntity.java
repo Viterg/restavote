@@ -16,7 +16,7 @@ public abstract class AbstractNamedEntity extends AbstractBaseEntity {
     @NotBlank
     @Size(min = 2, max = 100)
     @Column(name = "name", nullable = false)
-    @SafeHtml(groups = {View.Web.class}, whitelistType = NONE)
+    @SafeHtml(groups = View.Web.class, whitelistType = NONE)
     protected String name;
 
     protected AbstractNamedEntity() {

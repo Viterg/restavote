@@ -1,5 +1,7 @@
 package ru.viterg.restavote.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -16,6 +18,7 @@ public class Restaurant extends AbstractBaseEntity {
 
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY)//, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @OrderBy("day DESC")
+    @JsonIgnore
     private Set<Dish> dishes;
 
     // @CollectionTable(name = "votes", joinColumns = @JoinColumn(name = "REST_ID"),
@@ -27,6 +30,7 @@ public class Restaurant extends AbstractBaseEntity {
     // private Map<User, LocalDate> votes;
 
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.EAGER)
+    @JsonIgnore
     private Set<Vote> votes;
 
     public Restaurant() {

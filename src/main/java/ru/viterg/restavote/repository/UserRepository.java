@@ -39,6 +39,7 @@ public class UserRepository implements UserDetailsService {
         return repository.findAll(SORT_NAME_EMAIL);
     }
 
+    @Override
     public AuthorizedUser loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = getByEmail(email.toLowerCase());
         if (user == null) {

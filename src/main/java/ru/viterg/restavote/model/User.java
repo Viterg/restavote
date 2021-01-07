@@ -25,7 +25,7 @@ import static org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE;
       @NamedQuery(name = User.ALL_SORTED, query = "SELECT u FROM User u ORDER BY u.name, u.email"),
 })
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email", name = "users_unique_email_idx")})
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email", name = "users_unique_email_idx"))
 public class User extends AbstractNamedEntity implements HasIdAndEmail {
 
     public static final String DELETE     = "User.delete";
@@ -36,7 +36,7 @@ public class User extends AbstractNamedEntity implements HasIdAndEmail {
     @Email
     @NotBlank
     @Size(max = 100)
-    @SafeHtml(groups = {View.Web.class}, whitelistType = NONE)
+    @SafeHtml(groups = View.Web.class, whitelistType = NONE)
     private String email;
 
     @Column(name = "password", nullable = false)

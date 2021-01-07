@@ -62,7 +62,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .with(userHttpBasic(admin)))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-        assertThrows(NotFoundException.class, () -> userRepository.get(USER_ID));
+        assertNull(userRepository.get(USER_ID));
     }
 
     @Test
