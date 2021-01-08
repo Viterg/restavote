@@ -19,7 +19,10 @@ REST API using Hibernate/Spring/SpringMVC without frontend.
 
 Each restaurant provides a new menu each day.
 
-#### cURL samples (application deployed at application context `restavote`).
+#### BUILDING
+> mvn clean package -DskipTests=true org.codehaus.cargo:cargo-maven2-plugin:1.8.2:run
+
+#### cURL samples (application deployed at application context `restavote`):
 > For windows use `Git Bash`
 
 ##### get All Restaurants
