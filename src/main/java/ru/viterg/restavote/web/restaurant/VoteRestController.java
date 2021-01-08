@@ -2,14 +2,13 @@ package ru.viterg.restavote.web.restaurant;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.viterg.restavote.AuthorizedUser;
 import ru.viterg.restavote.model.Vote;
 import ru.viterg.restavote.repository.VoteRepository;
-import ru.viterg.restavote.util.Util;
-import ru.viterg.restavote.util.exception.NotFoundException;
 
 import java.time.Clock;
 import java.time.LocalDate;
@@ -28,17 +27,15 @@ public class VoteRestController {
     }
 
     @PostMapping("/{restId}/vote")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addVote(@PathVariable("restId") int restId, @AuthenticationPrincipal AuthorizedUser authUser) {
-        Vote vote = repository.get(authUser.getId(), LocalDate.now(Clock.systemDefaultZone()));
-        // repository.delete(authUser.getId(), LocalDate.now(Clock.systemDefaultZone()));
-        // if (vote.getRestaurant().getId() != restId) {
-        //     repository.save(new Vote(), authUser.getId(), restId);
-        // }
-        repository.save(Objects.requireNonNullElseGet(vote, Vote::new), authUser.getId(), restId);
+        Vote earlyVote = repository.get(authUser.getId(), LocalDate.now(Clock.systemDefaultZone()));
+        Vote saved = repository.save(Objects.requireNonNullElseGet(earlyVote, Vote::new), authUser.getId(), restId);
         log.info("add vote user.id={}, restaurant.id={}", authUser.getId(), restId);
     }
 
     @DeleteMapping("/{restId}/vote")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clear(@PathVariable("restId") int restId) {
         repository.deleteAll();
     }

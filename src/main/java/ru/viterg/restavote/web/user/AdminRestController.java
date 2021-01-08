@@ -50,7 +50,7 @@ public class AdminRestController extends AbstractUserController {
     public void update(@RequestBody User user, @PathVariable int id) throws BindException {
         validateBeforeUpdate(user, id);
         log.info("update {} with id={}", user, id);
-        update(user);
+        service.update(user);
     }
 
     @Override

@@ -7,14 +7,17 @@
 
     <http pattern="/resources/**" security="none"/>
 
-    <http pattern="/rest/**" use-expressions="true" name="restSecurityFilterChain" create-session="stateless">
+    <http pattern="/**" use-expressions="true" name="restSecurityFilterChain" create-session="stateless">
         <http-basic/>
-<!--        <intercept-url pattern="/rest/admin/**" access="permitAll()"/>-->
         <intercept-url pattern="/admin/**" access="hasRole('ADMIN')"/>
-        <!--        <intercept-url pattern="/rest/profile/register" access="permitAll()"/>-->
         <intercept-url pattern="/profile/register" access="isAnonymous()"/>
+        <intercept-url pattern="/profile/**" access="isAuthenticated()"/>
+
         <intercept-url pattern="/restaurants" access="permitAll()"/>
-        <!--        <intercept-url pattern="/**" access="isAuthenticated()"/>-->
+        <intercept-url pattern="/restaurants/**/menuOfDay" access="permitAll()"/>
+        <intercept-url pattern="/restaurants/**/vote" access="isAuthenticated()"/>
+
+        <intercept-url pattern="/**" access="permitAll()"/>
         <csrf disabled="true"/>
     </http>
 

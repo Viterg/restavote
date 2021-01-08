@@ -1,22 +1,18 @@
 package ru.viterg.restavote;
 
 import ru.viterg.restavote.model.*;
-import ru.viterg.restavote.to.DishTo;
-import ru.viterg.restavote.to.RestaurantTo;
 
 import java.time.Month;
 import java.util.List;
 
-import static java.time.LocalDate.of;
+import static java.time.LocalDate.*;
 import static ru.viterg.restavote.UserTestData.user1;
 import static ru.viterg.restavote.model.AbstractBaseEntity.START_SEQ;
 
 public class RestaurantsTestData {
-    public static final TestMatcher<Restaurant>   RESTAURANT_MATCHER    = TestMatcher.usingIgnoringFieldsComparator(Restaurant.class, "dishes", "votes");
-    public static final TestMatcher<RestaurantTo> RESTAURANT_TO_MATCHER = TestMatcher.usingEqualsComparator(RestaurantTo.class);
-    public static final TestMatcher<Dish>         DISH_MATCHER          = TestMatcher.usingIgnoringFieldsComparator(Dish.class, "restaurant");
-    public static final TestMatcher<DishTo>       DISH_TO_MATCHER       = TestMatcher.usingEqualsComparator(DishTo.class);
-    public static final TestMatcher<Vote>         VOTE_MATCHER          = TestMatcher.usingIgnoringFieldsComparator(Vote.class, "user", "restaurant");
+    public static final TestMatcher<Restaurant> RESTAURANT_MATCHER = TestMatcher.usingIgnoringFieldsComparator(Restaurant.class, "dishes", "votes");
+    public static final TestMatcher<Dish>       DISH_MATCHER       = TestMatcher.usingIgnoringFieldsComparator(Dish.class, "restaurant");
+    public static final TestMatcher<Vote>       VOTE_MATCHER       = TestMatcher.usingIgnoringFieldsComparator(Vote.class, "id", "user", "restaurant");
 
     public static final int NOT_FOUND           = 10;
     public static final int RESTAURANT_START_ID = START_SEQ + 3;
@@ -55,10 +51,10 @@ public class RestaurantsTestData {
     }
 
     public static Vote getNewVote() {
-        return new Vote(null, user1, of(2020, Month.AUGUST, 12), restaurant1);
+        return new Vote(null, user1, now(), restaurant1);
     }
 
     public static Vote getUpdatedVote() {
-        return new Vote(DISH_START_ID + 6, user1, of(2020, Month.JUNE, 12), restaurant1);
+        return new Vote(DISH_START_ID + 6, user1, now(), restaurant2);
     }
 }

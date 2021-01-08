@@ -18,7 +18,8 @@ import javax.annotation.PostConstruct;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@SpringJUnitWebConfig(locations = {"classpath:spring/spring-app.xml", "classpath:spring/front-servlet.xml",
+@SpringJUnitWebConfig(locations = {"classpath:spring/spring-app.xml",
+                                   "classpath:spring/front-servlet.xml",
                                    "classpath:spring/spring-db.xml"})
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 @Transactional
@@ -40,8 +41,10 @@ public abstract class AbstractControllerTest {
 
     @PostConstruct
     private void postConstruct() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).addFilter(CHARACTER_ENCODING_FILTER).apply(
-                springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                                 .addFilter(CHARACTER_ENCODING_FILTER)
+                                 .apply(springSecurity())
+                                 .build();
     }
 
     protected ResultActions perform(MockHttpServletRequestBuilder builder) throws Exception {

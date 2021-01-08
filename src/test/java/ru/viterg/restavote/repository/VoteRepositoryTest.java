@@ -70,7 +70,7 @@ class VoteRepositoryTest extends AbstractRepositoryTest {
         Vote updated = getUpdatedVote();
         repository.setVoteTime(LocalTime.of(10, 0));
         repository.save(updated, user1.getId(), restaurant1.getId());
-        VOTE_MATCHER.assertMatch(repository.get(user1.getId(), vote1.getVoteDate()), getUpdatedVote());
+        VOTE_MATCHER.assertMatch(repository.get(user1.getId(), updated.getVoteDate()), getUpdatedVote());
     }
 
     @Test
@@ -81,7 +81,6 @@ class VoteRepositoryTest extends AbstractRepositoryTest {
     @Test
     void createWithException() {
         repository.setVoteTime(LocalTime.of(10, 0));
-        validateRootCause(() -> repository.save(new Vote(null, user1, null, restaurant1), 101, 105), ConstraintViolationException.class);
         validateRootCause(() -> repository.save(new Vote(null, null, vote1.getVoteDate(), restaurant1), 101, 105), ConstraintViolationException.class);
         validateRootCause(() -> repository.save(new Vote(null, user1, vote1.getVoteDate(), null), 101, 105), ConstraintViolationException.class);
         validateRootCause(() -> repository.save(new Vote(null, null, vote1.getVoteDate(), null), 101, 105), ConstraintViolationException.class);

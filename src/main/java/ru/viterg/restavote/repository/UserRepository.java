@@ -3,24 +3,29 @@ package ru.viterg.restavote.repository;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import ru.viterg.restavote.AuthorizedUser;
 import ru.viterg.restavote.model.User;
+import ru.viterg.restavote.util.UserUtil;
 
 import java.util.List;
 
-@Repository("userService")
+@Repository
+// @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class UserRepository implements UserDetailsService {
     private static final Sort SORT_NAME_EMAIL = Sort.by(Sort.Direction.ASC, "name", "email");
 
     private final CrudUserRepository repository;
+    private final PasswordEncoder    passwordEncoder;
 
-    public UserRepository(CrudUserRepository repository) {
+    public UserRepository(CrudUserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User save(User user) {
-        return repository.save(user);
+        return repository.save(UserUtil.prepareToSave(user, passwordEncoder));
     }
 
     public boolean delete(int id) {
@@ -28,7 +33,7 @@ public class UserRepository implements UserDetailsService {
     }
 
     public User get(int id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id).orElse(null);  //orElseThrow
     }
 
     public User getByEmail(String email) {

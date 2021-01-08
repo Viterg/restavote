@@ -29,6 +29,7 @@ public class VoteRepository {
     public Vote save(Vote vote, int userId, int restaurantId) {
         LocalTime votingTime = voteTime == null ? LocalTime.now() : voteTime;
         if (votingTime.isBefore(DateTimeUtil.LAST_VOTE_TIME)) {
+            if (vote.getVoteDate() == null) vote.setVoteDate(LocalDate.now());
             vote.setUser(entityManager.getReference(User.class, userId));
             vote.setRestaurant(entityManager.getReference(Restaurant.class, restaurantId));
             return repository.save(vote);

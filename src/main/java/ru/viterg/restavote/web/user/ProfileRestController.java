@@ -1,8 +1,6 @@
 package ru.viterg.restavote.web.user;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
@@ -30,19 +28,22 @@ public class ProfileRestController extends AbstractUserController {
         delete(authUser.getId());
     }
 
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void update(@RequestBody UserTo userTo, @AuthenticationPrincipal AuthorizedUser authUser)
+            throws BindException {
+        validateBeforeUpdate(userTo, authUser.getId());
+        update(userTo, authUser.getId());
+    }
+
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<User> register(@Valid @RequestBody UserTo userTo) {
         User created = create(userTo);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(REST_URL).build().toUri();
+                                                          .path(REST_URL)
+                                                          .build()
+                                                          .toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
-    }
-
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@RequestBody UserTo userTo, @AuthenticationPrincipal AuthorizedUser authUser) throws BindException {
-        validateBeforeUpdate(userTo, authUser.getId());
-        update(userTo, authUser.getId());
     }
 }
