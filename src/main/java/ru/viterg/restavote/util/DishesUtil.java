@@ -4,7 +4,6 @@ package ru.viterg.restavote.util;
 import ru.viterg.restavote.model.Dish;
 import ru.viterg.restavote.to.DishTo;
 
-import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;

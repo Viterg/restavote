@@ -7,8 +7,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import static ru.viterg.restavote.util.DateTimeUtil.parseLocalDate;
-import static ru.viterg.restavote.util.DateTimeUtil.parseLocalTime;
+import static ru.viterg.restavote.util.DateTimeUtil.*;
 
 public class DateTimeFormatters {
     public static class LocalDateFormatter implements Formatter<LocalDate> {

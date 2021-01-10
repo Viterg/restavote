@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.viterg.restavote.model.Role;
 import ru.viterg.restavote.model.User;
 import ru.viterg.restavote.repository.UserRepository;
-import ru.viterg.restavote.util.exception.NotFoundException;
 import ru.viterg.restavote.web.AbstractControllerTest;
 
 import static org.junit.jupiter.api.Assertions.*;

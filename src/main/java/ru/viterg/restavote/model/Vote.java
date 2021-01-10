@@ -3,7 +3,6 @@ package ru.viterg.restavote.model;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Objects;
 
 @Entity
 @Table(name = "votes")
