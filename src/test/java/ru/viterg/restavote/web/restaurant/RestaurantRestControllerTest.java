@@ -32,9 +32,9 @@ public class RestaurantRestControllerTest extends AbstractControllerTest {
     void getMenuOfDay() throws Exception {
         Dish newDish = getNewDish();
         ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL + RESTAURANT_START_ID + "/dishes")
-                                                              .contentType(MediaType.APPLICATION_JSON)
-                                                              .content(JsonUtil.writeValue(newDish))
-                                                              .with(userHttpBasic(admin)));
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(JsonUtil.writeValue(newDish))
+                                                             .with(userHttpBasic(admin)));
         Dish created = readFromJson(action, Dish.class);
         newDish.setId(created.id());
         perform(MockMvcRequestBuilders.get(REST_URL + RESTAURANT_START_ID + "/menuOfDay").with(userHttpBasic(admin)))
@@ -55,7 +55,7 @@ public class RestaurantRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getUnauth() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + RESTAURANT_START_ID))
+        perform(MockMvcRequestBuilders.get(REST_URL + RESTAURANT_START_ID + "/dishes"))
                 .andExpect(status().isUnauthorized());
     }
 

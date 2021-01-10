@@ -48,7 +48,7 @@ public class DishTo extends BaseTo {
 
     @Override
     public String toString() {
-        return "MealTo{" +
+        return "DishTo{" +
                "id=" + id +
                ", dateTime=" + day +
                ", description='" + description + '\'' +
