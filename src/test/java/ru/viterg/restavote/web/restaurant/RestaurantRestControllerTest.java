@@ -5,10 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.viterg.restavote.model.Dish;
 import ru.viterg.restavote.model.Restaurant;
 import ru.viterg.restavote.repository.RestaurantRepository;
 import ru.viterg.restavote.web.AbstractControllerTest;
 import ru.viterg.restavote.web.json.JsonUtil;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -24,6 +27,22 @@ public class RestaurantRestControllerTest extends AbstractControllerTest {
 
     @Autowired
     private RestaurantRepository repository;
+
+    @Test
+    void getMenuOfDay() throws Exception {
+        Dish newDish = getNewDish();
+        ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL + RESTAURANT_START_ID + "/dishes")
+                                                              .contentType(MediaType.APPLICATION_JSON)
+                                                              .content(JsonUtil.writeValue(newDish))
+                                                              .with(userHttpBasic(admin)));
+        Dish created = readFromJson(action, Dish.class);
+        newDish.setId(created.id());
+        perform(MockMvcRequestBuilders.get(REST_URL + RESTAURANT_START_ID + "/menuOfDay").with(userHttpBasic(admin)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(DISH_MATCHER.contentJson(List.of(newDish)));
+    }
 
     @Test
     void get() throws Exception {

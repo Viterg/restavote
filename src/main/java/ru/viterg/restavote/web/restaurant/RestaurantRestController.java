@@ -2,11 +2,9 @@ package ru.viterg.restavote.web.restaurant;
 
 import org.slf4j.Logger;
 import org.springframework.http.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.viterg.restavote.AuthorizedUser;
 import ru.viterg.restavote.model.Dish;
 import ru.viterg.restavote.model.Restaurant;
 import ru.viterg.restavote.repository.DishRepository;
@@ -87,11 +85,4 @@ public class RestaurantRestController {
         Assert.notNull(restaurant, "dish must not be null");
         checkNotFoundWithId(restaurantRepository.save(restaurant), restaurant.id());
     }
-
-    // @PostMapping("/{restId}/vote")
-    // @ResponseStatus(HttpStatus.NO_CONTENT)
-    // public void voteFor(@PathVariable int restId, @AuthenticationPrincipal AuthorizedUser authUser) {
-    //     log.info("user {} votes for restaurant {}", authUser.getId(), restId);
-    //     restaurantRepository.voteFor(get(restId), authUser.getId());
-    // }
 }

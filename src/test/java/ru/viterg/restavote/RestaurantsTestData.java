@@ -43,11 +43,11 @@ public class RestaurantsTestData {
     }
 
     public static Dish getNewDish() {
-        return new Dish(null, of(2020, Month.FEBRUARY, 1), "Созданный ужин", 300);
+        return new Dish(null, now(), "Созданный ужин", 300);
     }
 
     public static Dish getUpdatedDish() {
-        return new Dish(DISH_START_ID, dish1.getDay().plusDays(2), "Обновленный завтрак", 200);
+        return new Dish(DISH_START_ID, dish1.getDay().minusDays(2), "Обновленный завтрак", 200);
     }
 
     public static Vote getNewVote() {

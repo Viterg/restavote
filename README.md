@@ -35,7 +35,7 @@ Each restaurant provides a new menu each day.
 `curl -s -v http://localhost:8080/restavote/restaurants/10 --user admin@gmail.com:admin`
 
 ##### update Restaurants
-`curl -s -X PUT -d '{"id"="103", "description":"Pronto"}' -H 'Content-Type: application/json' http://localhost:8080/restavote/restaurants/103 --user admin@gmail.com:admin`
+`curl -s -X PUT -d '{"id":"103", "description":"Pronto"}' -H 'Content-Type: application/json' http://localhost:8080/restavote/restaurants/103 --user admin@gmail.com:admin`
 
 ##### delete Restaurants
 `curl -s -X DELETE http://localhost:8080/restavote/restaurants/103 --user admin@gmail.com:admin`
@@ -45,19 +45,19 @@ Each restaurant provides a new menu each day.
 
 
 ##### get All Dishes
-`curl -s http://localhost:8080/restavote/restaurants/103/dishes --user user@yandex.ru:password`
+`curl -s http://localhost:8080/restavote/restaurants/103/dishes --user admin@gmail.com:admin`
 
 ##### create Dishes
-`curl -s -X POST -d '{"day"="2020-02-01", "description":"Созданный ужин", "price"="300"}' -H 'Content-Type:application/json;charset=UTF-8' http://localhost:8080/restavote/restaurants/103/dishes --user admin@gmail.com:admin`
+`curl -s -X POST -d '{"day":"2021-01-10", "description":"Созданный ужин", "price":"300"}' -H 'Content-Type:application/json;charset=UTF-8' http://localhost:8080/restavote/restaurants/103/dishes --user admin@gmail.com:admin`
 
 ##### get Dishes
-`curl -s http://localhost:8080/restavote/restaurants/103/dishes/107 --user admin@gmail.com:admin`
+`curl -s http://localhost:8080/restavote/restaurants/104/dishes/107 --user admin@gmail.com:admin`
 
 ##### get Dishes not found
 `curl -s -v http://localhost:8080/restavote/restaurants/103/dishes/10 --user admin@gmail.com:admin`
 
 ##### update Dishes
-`curl -s -X PUT -d '{"id"="106", "day"="2020-02-03", "description":"Обновленный завтрак", "price"="200"}' -H 'Content-Type: application/json' http://localhost:8080/restavote/restaurants/103/dishes/106 --user admin@gmail.com:admin`
+`curl -s -X PUT -d '{"id":"106", "day":"2020-02-03", "description":"Обновленный завтрак", "price":"200"}' -H 'Content-Type: application/json' http://localhost:8080/restavote/restaurants/103/dishes/106 --user admin@gmail.com:admin`
 
 ##### delete Dishes
 `curl -s -X DELETE http://localhost:8080/restavote/restaurants/103/dishes/106 --user admin@gmail.com:admin`
