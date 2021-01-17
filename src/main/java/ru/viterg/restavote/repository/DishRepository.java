@@ -1,56 +1,31 @@
 package ru.viterg.restavote.repository;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 import ru.viterg.restavote.model.Dish;
-import ru.viterg.restavote.model.Restaurant;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
-@Repository
-public class DishRepository {
+@Transactional(readOnly = true)
+public interface DishRepository extends BaseRepository<Dish> {
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    private final CrudDishRepository crudDishRepository;
-
-    public DishRepository(CrudDishRepository crudDishRepository) {
-        this.crudDishRepository = crudDishRepository;
-    }
-
+    @Modifying
     @Transactional
-    public Dish save(Dish dish, int restaurantId) {
-        if (!dish.isNew() && get(dish.getId(), restaurantId) == null) {
-            return null;
-        }
-        dish.setRestaurant(entityManager.getReference(Restaurant.class, restaurantId));
-        return crudDishRepository.save(dish);
-    }
+    @Query("DELETE FROM Dish d WHERE d.id=?1 AND d.restaurant.id=?2")
+    int delete(int id, int restaurantId);
 
-    public List<Dish> getAll(int restaurantId) {
-        return crudDishRepository.getAllByRestaurantId(restaurantId);
-    }
+    @Query("SELECT d FROM Dish d WHERE d.id=?1 AND d.restaurant.id=?2")
+    Optional<Dish> get(int id, int restaurantId);
 
-    public Dish get(int id, int restaurantId) {
-        return crudDishRepository.findById(id)
-                                 .filter(dish -> dish.getRestaurant().getId() == restaurantId)
-                                 .orElse(null);
-    }
+    @Query("SELECT d FROM Dish d WHERE d.restaurant.id = ?1")
+    List<Dish> getAllByRestaurantId(int restaurantId);
 
-    @Transactional
-    public boolean delete(int id, int restaurantId) {
-        return crudDishRepository.delete(id, restaurantId) != 0;
-    }
+    @Query("SELECT d FROM Dish d WHERE d.day = ?1 AND d.restaurant.id = ?2")
+    List<Dish> getAllByDayAndRestaurantId(LocalDate day, int restaurantId);
 
-    public Dish getWithRestaurant(int id, int restId) {
-        return crudDishRepository.getWithRestaurant(id, restId);
-    }
-
-    public List<Dish> getMenuOfDay(LocalDate day, int restId) {
-        return crudDishRepository.getAllByDayAndRestaurantId(day, restId);
-    }
+    @Query("SELECT d FROM Dish d JOIN FETCH d.restaurant r WHERE d.day = ?1")
+    List<Dish> getAllByDay(LocalDate day);
 }

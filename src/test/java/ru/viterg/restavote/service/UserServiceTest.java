@@ -1,20 +1,20 @@
-package ru.viterg.restavote.repository;
+package ru.viterg.restavote.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import ru.viterg.restavote.AbstractDataManageTest;
 import ru.viterg.restavote.model.Role;
 import ru.viterg.restavote.model.User;
-import ru.viterg.restavote.service.UserService;
 import ru.viterg.restavote.util.exception.NotFoundException;
 
 import javax.validation.ConstraintViolationException;
-import java.util.*;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static ru.viterg.restavote.UserTestData.*;
 
-public class UserRepositoryTest extends AbstractRepositoryTest {
+public class UserServiceTest extends AbstractDataManageTest {
 
     @Autowired
     protected UserService service;
@@ -71,9 +71,11 @@ public class UserRepositoryTest extends AbstractRepositoryTest {
 
     @Test
     void createWithException() {
-        validateRootCause(() -> service.create(new User(null, "  ", "mail@yandex.ru", "password", Role.USER)), ConstraintViolationException.class);
-        validateRootCause(() -> service.create(new User(null, "User", "  ", "password", Role.USER)), ConstraintViolationException.class);
-        validateRootCause(() -> service.create(new User(null, "User", "mail@yandex.ru", "  ", Role.USER)), ConstraintViolationException.class);
-        validateRootCause(() -> service.create(new User(null, "User", "mail@yandex.ru", "password", true, new Date(), Set.of())), ConstraintViolationException.class);
+        validateRootCause(ConstraintViolationException.class,
+                          () -> service.create(new User(null, "  ", "mail@yandex.ru", "password", Role.USER)));
+        validateRootCause(ConstraintViolationException.class,
+                          () -> service.create(new User(null, "User", "  ", "password", Role.USER)));
+        validateRootCause(ConstraintViolationException.class,
+                          () -> service.create(new User(null, "User", "mail@yandex.ru", "  ", Role.USER)));
     }
 }

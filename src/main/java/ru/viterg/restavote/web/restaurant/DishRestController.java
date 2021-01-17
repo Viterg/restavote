@@ -7,9 +7,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.viterg.restavote.model.Dish;
-import ru.viterg.restavote.repository.DishRepository;
-import ru.viterg.restavote.to.DishTo;
-import ru.viterg.restavote.util.DishesUtil;
+import ru.viterg.restavote.service.DishService;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -23,44 +21,42 @@ public class DishRestController {
     public static final  String REST_URL = "/restaurants/{restId}";
     private static final Logger log      = LoggerFactory.getLogger(DishRestController.class);
 
-    private final DishRepository repository;
+    private final DishService service;
 
-    public DishRestController(DishRepository repository) {
-        this.repository = repository;
+    public DishRestController(DishService service) {
+        this.service = service;
     }
 
     @GetMapping("/dishes/{id}")
     public Dish get(@PathVariable int id, @PathVariable int restId) {
-        log.info("get dish {} for user {}", id, restId);
-        return checkNotFoundWithId(repository.get(id, restId), id);
+        log.info("get dish {} for restaurant {}", id, restId);
+        return service.get(id, restId);
     }
 
     @DeleteMapping("/dishes/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int id, @PathVariable int restId) {
-        log.info("delete dish {} for user {}", id, restId);
-        checkNotFoundWithId(repository.delete(id, restId), id);
+        log.info("delete dish {} for restaurant {}", id, restId);
+        checkNotFoundWithId(service.delete(id, restId), id);
     }
 
     @GetMapping("/dishes")
-    public List<DishTo> getAll(@PathVariable int restId) {
-        log.info("getAll for user {}", restId);
-        return DishesUtil.getTos(repository.getAll(restId));
+    public List<Dish> getAll(@PathVariable int restId) {
+        log.info("getAll for restaurant {}", restId);
+        return service.getAll(restId);
     }
 
     @PutMapping(value = "/dishes/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@Valid @RequestBody Dish dish, @PathVariable int id,
-                       @PathVariable int restId) {
+    public void update(@Valid @RequestBody Dish dish, @PathVariable int id, @PathVariable int restId) {
         assureIdConsistent(dish, id);
-        log.info("update {} for user {}", dish, restId);
+        log.info("update {} for restaurant {}", dish, restId);
         Assert.notNull(dish, "dish must not be null");
-        checkNotFoundWithId(repository.save(dish, restId), dish.id());
+        checkNotFoundWithId(service.save(dish, restId), dish.id());
     }
 
     @PostMapping(value = "/dishes", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Dish> createWithLocation(@Valid @RequestBody Dish dish,
-                                                   @PathVariable int restId) {
+    public ResponseEntity<Dish> createWithLocation(@Valid @RequestBody Dish dish, @PathVariable int restId) {
         Dish created = create(dish, restId);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                                                           .path("/restaurants/" + restId + "/{id}")
@@ -70,8 +66,8 @@ public class DishRestController {
 
     public Dish create(Dish dish, int restId) {
         checkNew(dish);
-        log.info("create {} for user {}", dish, restId);
+        log.info("create {} for restaurant {}", dish, restId);
         Assert.notNull(dish, "dish must not be null");
-        return repository.save(dish, restId);
+        return service.save(dish, restId);
     }
 }

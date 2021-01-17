@@ -3,40 +3,24 @@ package ru.viterg.restavote.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.*;
-import org.hibernate.validator.constraints.SafeHtml;
 import org.springframework.util.CollectionUtils;
 import ru.viterg.restavote.HasIdAndEmail;
-import ru.viterg.restavote.View;
 
 import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.util.*;
 
-import static org.hibernate.validator.constraints.SafeHtml.WhiteListType.NONE;
-
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-@NamedQueries({
-      @NamedQuery(name = User.DELETE, query = "DELETE FROM User u WHERE u.id=:id"),
-      @NamedQuery(name = User.BY_EMAIL, query = "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email=?1"),
-      @NamedQuery(name = User.ALL_SORTED, query = "SELECT u FROM User u ORDER BY u.name, u.email"),
-})
 @Entity
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email", name = "users_unique_email_idx"))
 public class User extends AbstractNamedEntity implements HasIdAndEmail {
-
-    public static final String DELETE     = "User.delete";
-    public static final String BY_EMAIL   = "User.getByEmail";
-    public static final String ALL_SORTED = "User.getAllSorted";
 
     @Column(name = "email", nullable = false, unique = true)
     @Email
     @NotBlank
     @Size(max = 100)
-    @SafeHtml(groups = View.Web.class, whitelistType = NONE)
     private String email;
 
     @Column(name = "password", nullable = false)

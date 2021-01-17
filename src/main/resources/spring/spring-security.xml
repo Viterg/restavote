@@ -6,18 +6,24 @@
              http://www.springframework.org/schema/security/spring-security.xsd">
 
     <http pattern="/resources/**" security="none"/>
+    <http pattern="/webjars/**" security="none"/>
+
     <http pattern="/**" use-expressions="true" name="restSecurityFilterChain" create-session="stateless">
         <http-basic/>
         <intercept-url pattern="/admin/**" access="hasRole('ADMIN')"/>
         <intercept-url pattern="/profile/register" access="isAnonymous()"/>
         <intercept-url pattern="/profile/**" access="isAuthenticated()"/>
-
+        <!-- TODO можно модерируемые пути положить под /admin -->
         <intercept-url pattern="/restaurants" method="GET" access="permitAll()"/>
         <intercept-url pattern="/restaurants/*" method="GET" access="permitAll()"/>
         <intercept-url pattern="/restaurants/*/menuOfDay" access="permitAll()"/>
-        <intercept-url pattern="/**/vote" method="POST" access="isAuthenticated()"/>
-        <intercept-url pattern="/**/vote" method="DELETE" access="hasRole('ADMIN')"/>
+        <intercept-url pattern="/**/vote" access="isAuthenticated()"/>
+        <intercept-url pattern="/**/vote/**" access="isAuthenticated()"/>
         <intercept-url pattern="/restaurants/**" access="hasRole('ADMIN')"/>
+
+        <intercept-url pattern="/swagger-ui.html" access="permitAll()"/>
+        <intercept-url pattern="/swagger-resources/**" access="permitAll()"/>
+        <intercept-url pattern="/v2/api-docs/**" access="permitAll()"/>
 
         <intercept-url pattern="/**" access="permitAll()"/>
         <csrf disabled="true"/>

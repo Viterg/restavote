@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
-@Table(name = "restaurants")
+@Table(name = "restaurants", uniqueConstraints = @UniqueConstraint(columnNames = "description", name = "rest_unique_idx"))
 public class Restaurant extends AbstractBaseEntity {
 
     @Column(name = "description", nullable = false)
@@ -21,15 +21,7 @@ public class Restaurant extends AbstractBaseEntity {
     @JsonIgnore
     private Set<Dish> dishes;
 
-    // @CollectionTable(name = "votes", joinColumns = @JoinColumn(name = "REST_ID"),
-    //                  uniqueConstraints = @UniqueConstraint(columnNames = {"USER_ID", "vote_date"}, name = "user_vote_idx"))
-    // @MapKeyJoinColumn(name = "USER_ID")
-    // @Column(name = "vote_date")
-    // @ElementCollection(fetch = FetchType.EAGER)
-    // @BatchSize(size = 200)
-    // private Map<User, LocalDate> votes;
-
-    @OneToMany(mappedBy = "restaurant", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Vote> votes;
 

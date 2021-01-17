@@ -1,5 +1,6 @@
 package ru.viterg.restavote.util;
 
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
@@ -18,6 +19,10 @@ public class DateTimeUtil {
 
 
     private DateTimeUtil() {
+    }
+
+    public static boolean isTimeAvailableForVote(@NonNull LocalTime voteTime) {
+        return voteTime.isBefore(LAST_VOTE_TIME);
     }
 
     public static LocalDateTime atStartOfDayOrMin(LocalDate localDate) {

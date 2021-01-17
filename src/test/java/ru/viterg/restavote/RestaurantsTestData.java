@@ -22,14 +22,14 @@ public class RestaurantsTestData {
     public static final Restaurant restaurant2 = new Restaurant(RESTAURANT_START_ID + 1, "Пронтера");
     public static final Restaurant restaurant3 = new Restaurant(RESTAURANT_START_ID + 2, "Папа Джонс");
 
-    public static final Dish dish1 = new Dish(DISH_START_ID, of(2020, Month.JANUARY, 30), "Завтрак", 500);
-    public static final Dish dish2 = new Dish(DISH_START_ID + 1, of(2020, Month.JANUARY, 30), "Обед", 1000);
-    public static final Dish dish3 = new Dish(DISH_START_ID + 2, of(2020, Month.JANUARY, 30), "Ужин", 500);
-    public static final Dish dish4 = new Dish(DISH_START_ID + 3, of(2020, Month.JANUARY, 31), "Завтрак", 500);
-    public static final Dish dish5 = new Dish(DISH_START_ID + 4, of(2020, Month.JANUARY, 31), "Обед", 1000);
-    public static final Dish dish6 = new Dish(DISH_START_ID + 5, of(2020, Month.JANUARY, 31), "Ужин", 510);
+    public static final Dish dish1 = new Dish(DISH_START_ID, of(2020, Month.DECEMBER, 30), "Завтрак", 500);
+    public static final Dish dish2 = new Dish(DISH_START_ID + 1, of(2020, Month.DECEMBER, 30), "Обед", 1000);
+    public static final Dish dish3 = new Dish(DISH_START_ID + 2, of(2020, Month.DECEMBER, 30), "Ужин", 500);
+    public static final Dish dish4 = new Dish(DISH_START_ID + 3, of(2020, Month.DECEMBER, 31), "Завтрак", 500);
+    public static final Dish dish5 = new Dish(DISH_START_ID + 4, of(2020, Month.DECEMBER, 31), "Обед", 1000);
+    public static final Dish dish6 = new Dish(DISH_START_ID + 5, of(2020, Month.DECEMBER, 31), "Ужин", 510);
 
-    public static final Vote vote1 = new Vote(DISH_START_ID + 6, user1, of(2020, Month.JUNE, 12), restaurant3);
+    public static final Vote vote1 = new Vote(DISH_START_ID + 6, user1, of(2020, Month.DECEMBER, 30), restaurant3);
 
     public static final List<Restaurant> restaurants = List.of(restaurant1, restaurant2, restaurant3);
     public static final List<Dish>       dishes      = List.of(dish6, dish5, dish4, dish3, dish2, dish1);

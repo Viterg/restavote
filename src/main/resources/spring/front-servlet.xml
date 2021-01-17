@@ -7,9 +7,11 @@
        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
-    <bean class="ru.viterg.restavote.web.json.JacksonObjectMapper" id="objectMapper" factory-method="getMapper"/>
-
+    <context:component-scan base-package="ru.viterg.**.web"/>
     <security:global-method-security secured-annotations="enabled" pre-post-annotations="enabled"/>
+
+    <bean class="ru.viterg.restavote.web.json.JacksonObjectMapper" id="objectMapper" factory-method="getMapper"/>
+    <bean id="defaultValidator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
     <mvc:annotation-driven conversion-service="conversionService">
         <mvc:message-converters>
@@ -39,17 +41,10 @@
         </property>
     </bean>
 
-    <context:component-scan base-package="ru.viterg.**.web"/>
+    <!-- use WebJars so Javascript and CSS libs can be declared as Maven dependencies (Bootstrap, jQuery...) -->
+    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
+    <!--  Swagger2  https://medium.com/@andreymamontov/swagger-2-configuration-with-spring-xml-3cd643a12425 -->
+    <bean class="springfox.documentation.swagger2.configuration.Swagger2DocumentationConfiguration"/>
+    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/" />
 
-    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
-        <property name="defaultLocale" value="ru"/>
-    </bean>
-
-    <mvc:interceptors>
-        <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
-            <property name="paramName" value="lang"/>
-        </bean>
-    </mvc:interceptors>
-
-    <bean id="defaultValidator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 </beans>

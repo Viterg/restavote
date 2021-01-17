@@ -9,7 +9,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.viterg.restavote.model.Role;
 import ru.viterg.restavote.model.User;
-import ru.viterg.restavote.repository.UserRepository;
+import ru.viterg.restavote.service.UserService;
+import ru.viterg.restavote.util.exception.NotFoundException;
 import ru.viterg.restavote.web.AbstractControllerTest;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,12 +26,12 @@ class AdminRestControllerTest extends AbstractControllerTest {
     private static final String REST_URL = AdminRestController.REST_URL + '/';
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService service;
 
     @Test
     void get() throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL + ADMIN_ID)
-                .with(userHttpBasic(admin)))
+                                      .with(userHttpBasic(admin)))
                 .andExpect(status().isOk())
                 .andDo(print())
                 // https://jira.spring.io/browse/SPR-14472
@@ -41,7 +42,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Test
     void getNotFound() throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL + 1)
-                .with(userHttpBasic(admin)))
+                                      .with(userHttpBasic(admin)))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
     }
@@ -49,7 +50,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Test
     void getByEmail() throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL + "by?email=" + admin.getEmail())
-                .with(userHttpBasic(admin)))
+                                      .with(userHttpBasic(admin)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(USER_MATCHER.contentJson(admin));
@@ -58,16 +59,16 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Test
     void delete() throws Exception {
         perform(MockMvcRequestBuilders.delete(REST_URL + USER_ID)
-                .with(userHttpBasic(admin)))
+                                      .with(userHttpBasic(admin)))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-        assertNull(userRepository.get(USER_ID));
+        assertThrows(NotFoundException.class, () -> service.get(USER_ID));
     }
 
     @Test
     void deleteNotFound() throws Exception {
         perform(MockMvcRequestBuilders.delete(REST_URL + 1)
-                .with(userHttpBasic(admin)))
+                                      .with(userHttpBasic(admin)))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
     }
@@ -81,7 +82,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Test
     void getForbidden() throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL)
-                .with(userHttpBasic(user1)))
+                                      .with(userHttpBasic(user1)))
                 .andExpect(status().isForbidden());
     }
 
@@ -90,35 +91,34 @@ class AdminRestControllerTest extends AbstractControllerTest {
         User updated = getUpdated();
         updated.setId(null);
         perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(admin))
-                .content(jsonWithPassword(updated, "newPass")))
+                                      .contentType(MediaType.APPLICATION_JSON)
+                                      .with(userHttpBasic(admin))
+                                      .content(jsonWithPassword(updated, "newPass")))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-
-        USER_MATCHER.assertMatch(userRepository.get(USER_ID), getUpdated());
+        USER_MATCHER.assertMatch(service.get(USER_ID), getUpdated());
     }
 
     @Test
     void createWithLocation() throws Exception {
         User newUser = getNew();
         ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(admin))
-                .content(jsonWithPassword(newUser, "newPass")))
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .with(userHttpBasic(admin))
+                                                             .content(jsonWithPassword(newUser, "newPass")))
                 .andExpect(status().isCreated());
 
         User created = readFromJson(action, User.class);
         int newId = created.id();
         newUser.setId(newId);
         USER_MATCHER.assertMatch(created, newUser);
-        USER_MATCHER.assertMatch(userRepository.get(newId), newUser);
+        USER_MATCHER.assertMatch(service.get(newId), newUser);
     }
 
     @Test
     void getAll() throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL)
-                .with(userHttpBasic(admin)))
+                                      .with(userHttpBasic(admin)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(USER_MATCHER.contentJson(admin, user1, user2));
@@ -127,22 +127,21 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Test
     void enable() throws Exception {
         perform(MockMvcRequestBuilders.patch(REST_URL + USER_ID)
-                .param("enabled", "false")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(admin)))
+                                      .param("enabled", "false")
+                                      .contentType(MediaType.APPLICATION_JSON)
+                                      .with(userHttpBasic(admin)))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-
-        assertFalse(userRepository.get(USER_ID).isEnabled());
+        assertFalse(service.get(USER_ID).isEnabled());
     }
 
     @Test
     void createInvalid() throws Exception {
         User invalid = new User(null, null, "", "newPass", Role.USER, Role.ADMIN);
         perform(MockMvcRequestBuilders.post(REST_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(admin))
-                .content(jsonWithPassword(invalid, "newPass")))
+                                      .contentType(MediaType.APPLICATION_JSON)
+                                      .with(userHttpBasic(admin))
+                                      .content(jsonWithPassword(invalid, "newPass")))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(errorType(VALIDATION_ERROR));
@@ -153,22 +152,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
         User invalid = new User(user1);
         invalid.setName("");
         perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(admin))
-                .content(jsonWithPassword(invalid, "password")))
-                .andDo(print())
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(errorType(VALIDATION_ERROR));
-    }
-
-    @Test
-    void updateHtmlUnsafe() throws Exception {
-        User updated = new User(user1);
-        updated.setName("<script>alert(123)</script>");
-        perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(admin))
-                .content(jsonWithPassword(updated, "password")))
+                                      .contentType(MediaType.APPLICATION_JSON)
+                                      .with(userHttpBasic(admin))
+                                      .content(jsonWithPassword(invalid, "password")))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(errorType(VALIDATION_ERROR));
@@ -180,9 +166,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
         User updated = new User(user1);
         updated.setEmail("admin@gmail.com");
         perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(admin))
-                .content(jsonWithPassword(updated, "password")))
+                                      .contentType(MediaType.APPLICATION_JSON)
+                                      .with(userHttpBasic(admin))
+                                      .content(jsonWithPassword(updated, "password")))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(errorType(VALIDATION_ERROR))
@@ -194,9 +180,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
     void createDuplicate() throws Exception {
         User expected = new User(null, "New", "user1@yandex.ru", "newPass", Role.USER, Role.ADMIN);
         perform(MockMvcRequestBuilders.post(REST_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(admin))
-                .content(jsonWithPassword(expected, "newPass")))
+                                      .contentType(MediaType.APPLICATION_JSON)
+                                      .with(userHttpBasic(admin))
+                                      .content(jsonWithPassword(expected, "newPass")))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(errorType(VALIDATION_ERROR))

@@ -8,7 +8,6 @@ import org.springframework.validation.*;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import ru.viterg.restavote.HasId;
-import ru.viterg.restavote.View;
 import ru.viterg.restavote.model.User;
 import ru.viterg.restavote.service.UserService;
 import ru.viterg.restavote.to.UserTo;
@@ -81,7 +80,7 @@ public abstract class AbstractUserController {
         ValidationUtil.assureIdConsistent(user, id);
         DataBinder binder = new DataBinder(user);
         binder.addValidators(emailValidator, validator);
-        binder.validate(View.Web.class);
+        binder.validate();
         if (binder.getBindingResult().hasErrors()) {
             throw new BindException(binder.getBindingResult());
         }

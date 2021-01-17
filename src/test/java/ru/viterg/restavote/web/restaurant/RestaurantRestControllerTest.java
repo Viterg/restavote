@@ -13,7 +13,7 @@ import ru.viterg.restavote.web.json.JsonUtil;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.viterg.restavote.RestaurantsTestData.*;
@@ -70,7 +70,7 @@ public class RestaurantRestControllerTest extends AbstractControllerTest {
     void delete() throws Exception {
         perform(MockMvcRequestBuilders.delete(REST_URL + RESTAURANT_START_ID).with(userHttpBasic(admin)))
                 .andExpect(status().isNoContent());
-        assertNull(repository.get(RESTAURANT_START_ID));
+        assertTrue(repository.findById(RESTAURANT_START_ID).isEmpty());
     }
 
     @Test
@@ -82,11 +82,12 @@ public class RestaurantRestControllerTest extends AbstractControllerTest {
     @Test
     void update() throws Exception {
         Restaurant updated = getUpdatedRestaurant();
-        perform(MockMvcRequestBuilders.put(REST_URL + RESTAURANT_START_ID).contentType(MediaType.APPLICATION_JSON)
+        perform(MockMvcRequestBuilders.put(REST_URL + RESTAURANT_START_ID)
+                                      .contentType(MediaType.APPLICATION_JSON)
                                       .content(JsonUtil.writeValue(updated))
                                       .with(userHttpBasic(admin)))
                 .andExpect(status().isNoContent());
-        RESTAURANT_MATCHER.assertMatch(repository.get(RESTAURANT_START_ID), updated);
+        RESTAURANT_MATCHER.assertMatch(repository.findById(RESTAURANT_START_ID).orElse(null), updated);
     }
 
     @Test
@@ -100,7 +101,7 @@ public class RestaurantRestControllerTest extends AbstractControllerTest {
         int newId = created.id();
         newRestaurant.setId(newId);
         RESTAURANT_MATCHER.assertMatch(created, newRestaurant);
-        RESTAURANT_MATCHER.assertMatch(repository.get(newId), newRestaurant);
+        RESTAURANT_MATCHER.assertMatch(repository.findById(newId).orElse(null), newRestaurant);
     }
 
     @Test
@@ -110,6 +111,22 @@ public class RestaurantRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(RESTAURANT_MATCHER.contentJson(restaurants));
+    }
+
+    @Test
+    void getAllOfDay() throws Exception {
+        Dish newDish = getNewDish();
+        ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL + RESTAURANT_START_ID + "/dishes")
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(JsonUtil.writeValue(newDish))
+                                                             .with(userHttpBasic(admin)));
+        Dish created = readFromJson(action, Dish.class);
+        newDish.setId(created.id());
+        perform(MockMvcRequestBuilders.get(REST_URL + "/allOfDay").with(userHttpBasic(admin)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(RESTAURANT_MATCHER.contentJson(List.of(restaurant1)));
     }
 
     @Test
@@ -127,18 +144,6 @@ public class RestaurantRestControllerTest extends AbstractControllerTest {
     @Test
     void updateInvalid() throws Exception {
         Restaurant invalid = new Restaurant(RESTAURANT_START_ID, null);
-        perform(MockMvcRequestBuilders.put(REST_URL + RESTAURANT_START_ID)
-                                      .contentType(MediaType.APPLICATION_JSON)
-                                      .content(JsonUtil.writeValue(invalid))
-                                      .with(userHttpBasic(admin)))
-                .andDo(print())
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(errorType(VALIDATION_ERROR));
-    }
-
-    @Test
-    void updateHtmlUnsafe() throws Exception {
-        Restaurant invalid = new Restaurant(RESTAURANT_START_ID, "<script>alert(123)</script>");
         perform(MockMvcRequestBuilders.put(REST_URL + RESTAURANT_START_ID)
                                       .contentType(MediaType.APPLICATION_JSON)
                                       .content(JsonUtil.writeValue(invalid))

@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public class Vote extends AbstractBaseEntity {
 
     @NotNull
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -18,7 +18,7 @@ public class Vote extends AbstractBaseEntity {
     private LocalDate voteDate;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rest_id")
     private Restaurant restaurant;
 

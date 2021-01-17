@@ -8,7 +8,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.viterg.restavote.model.User;
-import ru.viterg.restavote.repository.UserRepository;
+import ru.viterg.restavote.service.UserService;
 import ru.viterg.restavote.to.UserTo;
 import ru.viterg.restavote.util.UserUtil;
 import ru.viterg.restavote.web.AbstractControllerTest;
@@ -25,7 +25,7 @@ import static ru.viterg.restavote.web.user.ProfileRestController.REST_URL;
 class ProfileRestControllerTest extends AbstractControllerTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService service;
 
     @Test
     void get() throws Exception {
@@ -47,7 +47,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
         perform(MockMvcRequestBuilders.delete(REST_URL)
                                       .with(userHttpBasic(admin)))
                 .andExpect(status().isNoContent());
-        USER_MATCHER.assertMatch(userRepository.getAll(), user1, user2);
+        USER_MATCHER.assertMatch(service.getAll(), user1, user2);
     }
 
     @Test
@@ -64,19 +64,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
         int newId = created.getId();
         newUser.setId(newId);
         USER_MATCHER.assertMatch(created, newUser);
-        USER_MATCHER.assertMatch(userRepository.get(newId), newUser);
-    }
-
-    @Test
-    void update() throws Exception {
-        UserTo updatedTo = new UserTo(null, "newName", "user1@yandex.ru", "newPassword");
-        perform(MockMvcRequestBuilders.put(REST_URL)
-                                      .contentType(MediaType.APPLICATION_JSON)
-                                      .with(userHttpBasic(user1))
-                                      .content(JsonUtil.writeValue(updatedTo)))
-                .andDo(print())
-                .andExpect(status().isNoContent());
-        USER_MATCHER.assertMatch(userRepository.get(USER_ID), UserUtil.updateFromTo(new User(user1), updatedTo));
+        USER_MATCHER.assertMatch(service.get(newId), newUser);
     }
 
     @Test
@@ -88,6 +76,18 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(errorType(VALIDATION_ERROR));
+    }
+
+    @Test
+    void update() throws Exception {
+        UserTo updatedTo = new UserTo(null, "newName", "user1@yandex.ru", "newPassword");
+        perform(MockMvcRequestBuilders.put(REST_URL)
+                                      .contentType(MediaType.APPLICATION_JSON)
+                                      .with(userHttpBasic(user1))
+                                      .content(JsonUtil.writeValue(updatedTo)))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+        USER_MATCHER.assertMatch(service.get(USER_ID), UserUtil.updateFromTo(new User(user1), updatedTo));
     }
 
     @Test

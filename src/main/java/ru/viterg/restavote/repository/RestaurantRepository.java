@@ -1,39 +1,20 @@
 package ru.viterg.restavote.repository;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.transaction.annotation.Transactional;
 import ru.viterg.restavote.model.Restaurant;
 
 import java.util.List;
 
-@Repository
-public class RestaurantRepository {
+@Transactional(readOnly = true)
+public interface RestaurantRepository extends BaseRepository<Restaurant> {
 
-    private final CrudRestaurantRepository repository;
-
-    public RestaurantRepository(CrudRestaurantRepository repository) {
-        this.repository = repository;
-    }
-
-    public List<Restaurant> getAll() {
-        return repository.findAll();
-    }
-
-    public Restaurant get(int id) {
-        return repository.findById(id).orElse(null);
-    }
-
+    @Modifying
     @Transactional
-    public boolean delete(int id) {
-        return repository.delete(id) != 0;
-    }
+    @Query("DELETE FROM Restaurant r WHERE r.id=?1")
+    int delete(int id);
 
-    @Transactional
-    public Restaurant save(Restaurant restaurant) {
-        return repository.save(restaurant);
-    }
-
-    public Restaurant getWithDishes(int id) {
-        return repository.getWithDishes(id);
-    }
+    @EntityGraph(attributePaths = "dishes", type = EntityGraph.EntityGraphType.LOAD)
+    @Query("SELECT r FROM Restaurant r")
+    List<Restaurant> getAllWithDishes();
 }

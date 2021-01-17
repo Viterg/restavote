@@ -2,17 +2,18 @@ package ru.viterg.restavote.repository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import ru.viterg.restavote.AbstractDataManageTest;
 import ru.viterg.restavote.model.Dish;
 
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.viterg.restavote.RestaurantsTestData.*;
 
-public class DishRepositoryTest extends AbstractRepositoryTest {
+public class DishRepositoryTest extends AbstractDataManageTest {
 
     @Autowired
     protected DishRepository dishRepository;
@@ -20,77 +21,49 @@ public class DishRepositoryTest extends AbstractRepositoryTest {
     @Test
     void delete() {
         dishRepository.delete(dish1.getId(), restaurant1.getId());
-        assertNull(dishRepository.get(dish1.getId(), restaurant1.getId()));
+        assertTrue(dishRepository.get(dish1.getId(), restaurant1.getId()).isEmpty());
     }
 
     @Test
     void deleteNotFound() {
-        assertFalse(dishRepository.delete(NOT_FOUND, restaurant1.getId()));
+        assertFalse(dishRepository.delete(NOT_FOUND, restaurant1.getId()) != 0);
     }
 
     @Test
     void deleteNotOwn() {
-        assertFalse(dishRepository.delete(dish1.getId(), restaurant3.getId()));
-    }
-
-    @Test
-    void create() {
-        Dish created = dishRepository.save(getNewDish(), restaurant1.getId());
-        int newId = created.id();
-        Dish newMeal = getNewDish();
-        newMeal.setId(newId);
-        DISH_MATCHER.assertMatch(created, newMeal);
-        DISH_MATCHER.assertMatch(dishRepository.get(newId, restaurant1.getId()), newMeal);
+        assertFalse(dishRepository.delete(dish1.getId(), restaurant3.getId()) != 0);
     }
 
     @Test
     void get() {
-        Dish actual = dishRepository.get(dish1.getId(), restaurant1.getId());
-        DISH_MATCHER.assertMatch(actual, dish1);
+        DISH_MATCHER.assertMatch(dishRepository.getExisted(dish1.getId()), dish1);
     }
 
     @Test
     void getNotFound() {
-        assertNull(dishRepository.get(NOT_FOUND, restaurant1.getId()));
+        assertTrue(dishRepository.get(NOT_FOUND, restaurant1.getId()).isEmpty());
     }
 
     @Test
     void getNotOwn() {
-        assertNull(dishRepository.get(dish1.getId(), restaurant3.getId()));
-    }
-
-    @Test
-    void update() {
-        Dish updated = getUpdatedDish();
-        dishRepository.save(updated, restaurant1.getId());
-        DISH_MATCHER.assertMatch(dishRepository.get(dish1.getId(), restaurant1.getId()), getUpdatedDish());
-    }
-
-    @Test
-    void updateNotOwn() {
-        assertNull(dishRepository.save(dish1, restaurant3.getId()));
-        DISH_MATCHER.assertMatch(dishRepository.get(dish1.getId(), restaurant1.getId()), dish1);
+        assertTrue(dishRepository.get(dish1.getId(), restaurant3.getId()).isEmpty());
     }
 
     @Test
     void getAll() {
-        DISH_MATCHER.assertMatch(dishRepository.getAll(restaurant1.getId()), dish1, dish4);
+        DISH_MATCHER.assertMatch(dishRepository.getAllByRestaurantId(restaurant1.getId()), dish1, dish4);
     }
 
     @Test
     void getMenuOfDay() {
-        DISH_MATCHER.assertMatch(
-                dishRepository.getMenuOfDay(LocalDate.of(2020, Month.JANUARY, 30), restaurant1.getId()), dish1);
+        LocalDate day = LocalDate.of(2020, Month.DECEMBER, 30);
+        List<Dish> menuOfDay = dishRepository.getAllByDayAndRestaurantId(day, restaurant1.getId());
+        DISH_MATCHER.assertMatch(menuOfDay, dish1);
     }
 
     @Test
     void getMenuOfNullDay() {
-        DISH_MATCHER.assertMatch(dishRepository.getMenuOfDay(null, restaurant1.getId()), Collections.emptyList());
-    }
-
-    @Test
-    void createWithException() {
-        validateRootCause(() -> dishRepository.save(new Dish(null, LocalDate.of(2015, Month.JUNE, 1), "  ", 300), restaurant1.getId()), ConstraintViolationException.class);
-        validateRootCause(() -> dishRepository.save(new Dish(null, null, "Description", 300), restaurant1.getId()), ConstraintViolationException.class);
+        List<Dish> menuOfDay = dishRepository.getAllByDayAndRestaurantId(null, restaurant1.getId());
+        DISH_MATCHER.assertMatch(menuOfDay, Collections.emptyList());
     }
 }

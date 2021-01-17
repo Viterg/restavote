@@ -9,6 +9,8 @@ import ru.viterg.restavote.model.User;
 import ru.viterg.restavote.repository.UserRepository;
 import ru.viterg.restavote.web.ExceptionInfoHandler;
 
+import java.util.Optional;
+
 
 @Component
 public class UniqueMailValidator implements org.springframework.validation.Validator {
@@ -28,8 +30,8 @@ public class UniqueMailValidator implements org.springframework.validation.Valid
     public void validate(Object target, Errors errors) {
         HasIdAndEmail user = ((HasIdAndEmail) target);
         if (StringUtils.hasText(user.getEmail())) {
-            User dbUser = repository.getByEmail(user.getEmail().toLowerCase());
-            if (dbUser != null && !dbUser.getId().equals(user.getId())) {
+            Optional<User> dbUser = repository.getByEmail(user.getEmail().toLowerCase());
+            if (dbUser.isPresent() && !dbUser.get().getId().equals(user.getId())) {
                 errors.rejectValue("email", ExceptionInfoHandler.EXCEPTION_DUPLICATE_EMAIL);
             }
         }

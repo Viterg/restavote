@@ -1,9 +1,9 @@
 package ru.viterg.restavote.service;
 
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,12 +18,12 @@ import ru.viterg.restavote.util.UserUtil;
 import ru.viterg.restavote.util.ValidationUtil;
 
 import java.util.List;
-
-import static ru.viterg.restavote.util.ValidationUtil.checkNotFoundWithId;
+import java.util.Optional;
 
 @Service("userService")
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class UserService implements UserDetailsService {
+    private static final Sort SORT_NAME_EMAIL = Sort.by(Sort.Direction.ASC, "name", "email");
 
     private final UserRepository  repository;
     private final PasswordEncoder passwordEncoder;
@@ -31,37 +31,6 @@ public class UserService implements UserDetailsService {
     public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    @CacheEvict(value = "users", allEntries = true)
-    public User create(User user) {
-        Assert.notNull(user, "user must not be null");
-        return prepareAndSave(user);
-    }
-
-    @CacheEvict(value = "users", allEntries = true)
-    public void delete(int id) {
-        checkNotFoundWithId(repository.delete(id), id);
-    }
-
-    public User get(int id) {
-        return checkNotFoundWithId(repository.get(id), id);
-    }
-
-    public User getByEmail(String email) {
-        Assert.notNull(email, "email must not be null");
-        return ValidationUtil.checkNotFound(repository.getByEmail(email), "email=" + email);
-    }
-
-    @Cacheable("users")
-    public List<User> getAll() {
-        return repository.getAll();
-    }
-
-    @CacheEvict(value = "users", allEntries = true)
-    public void update(User user) {
-        Assert.notNull(user, "user must not be null");
-        prepareAndSave(user);
     }
 
     @CacheEvict(value = "users", allEntries = true)
@@ -78,13 +47,44 @@ public class UserService implements UserDetailsService {
         user.setEnabled(enabled);
     }
 
+    @CacheEvict(value = "users", allEntries = true)
+    public User create(User user) {
+        Assert.notNull(user, "user must not be null");
+        return prepareAndSave(user);
+    }
+
+    @CacheEvict(value = "users", allEntries = true)
+    public void delete(int id) {
+        ValidationUtil.checkNotFoundWithId(repository.delete(id) != 0, id);
+    }
+
+    @CacheEvict(value = "users", allEntries = true)
+    public void update(User user) {
+        Assert.notNull(user, "user must not be null");
+        prepareAndSave(user);
+    }
+
+    public User getByEmail(String email) {
+        Assert.notNull(email, "email must not be null");
+        return ValidationUtil.checkNotFound(repository.getByEmail(email), "email=" + email);
+    }
+
+    public User get(int id) {
+        return repository.getExisted(id);
+    }
+
+    public List<User> getAll() {
+        return repository.findAll(SORT_NAME_EMAIL);
+    }
+
     @Override
     public AuthorizedUser loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = repository.getByEmail(email.toLowerCase());
-        if (user == null) {
+        Optional<User> user = repository.getByEmail(email.toLowerCase());
+        if (user.isPresent()) {
+            return new AuthorizedUser(user.get());
+        } else {
             throw new UsernameNotFoundException("User " + email + " is not found");
         }
-        return new AuthorizedUser(user);
     }
 
     private User prepareAndSave(User user) {

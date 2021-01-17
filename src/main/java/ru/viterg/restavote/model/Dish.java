@@ -7,20 +7,11 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
-@NamedQueries({
-    @NamedQuery(name = Dish.ALL_SORTED, query = "SELECT d FROM Dish d WHERE d.restaurant.id=:restId ORDER BY d.day DESC"),
-    @NamedQuery(name = Dish.DELETE, query = "DELETE FROM Dish d WHERE d.id=:id AND d.restaurant.id=:restId"),
-    @NamedQuery(name = Dish.GET_BETWEEN, query = """
-                            SELECT d FROM Dish d WHERE d.restaurant.id=:restId AND d.day >= :startDateTime
-                            AND d.day < :endDateTime ORDER BY d.day DESC"""),
-              })
 @Entity
-@Table(name = "dishes", uniqueConstraints = @UniqueConstraint(columnNames = {"rest_id", "day_value"},
-                                                              name = "meals_unique_rest_datetime_idx"))
+@Table(name = "dishes", uniqueConstraints = @UniqueConstraint(
+        columnNames = {"rest_id", "day_value", "description"}, name = "menu_unique_idx")
+)
 public class Dish extends AbstractBaseEntity {
-    public static final String ALL_SORTED  = "Dish.getAll";
-    public static final String DELETE      = "Dish.delete";
-    public static final String GET_BETWEEN = "Dish.getBetween";
 
     @Column(name = "day_value", nullable = false)
     @NotNull

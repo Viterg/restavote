@@ -2,6 +2,7 @@ package ru.viterg.restavote.repository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import ru.viterg.restavote.AbstractDataManageTest;
 import ru.viterg.restavote.model.Restaurant;
 
 import javax.validation.ConstraintViolationException;
@@ -9,7 +10,7 @@ import javax.validation.ConstraintViolationException;
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.viterg.restavote.RestaurantsTestData.*;
 
-public class RestaurantRepositoryTest extends AbstractRepositoryTest {
+public class RestaurantRepositoryTest extends AbstractDataManageTest {
 
     @Autowired
     protected RestaurantRepository restaurantRepository;
@@ -17,12 +18,12 @@ public class RestaurantRepositoryTest extends AbstractRepositoryTest {
     @Test
     void delete() {
         restaurantRepository.delete(restaurant1.getId());
-        assertNull(restaurantRepository.get(restaurant1.getId()));
+        assertTrue(restaurantRepository.findById(restaurant1.getId()).isEmpty());
     }
 
     @Test
     void deleteNotFound() {
-        assertFalse(restaurantRepository.delete(NOT_FOUND));
+        assertFalse(restaurantRepository.delete(NOT_FOUND) != 0);
     }
 
     @Test
@@ -32,35 +33,38 @@ public class RestaurantRepositoryTest extends AbstractRepositoryTest {
         Restaurant newRestaurant = getNewRestaurant();
         newRestaurant.setId(newId);
         RESTAURANT_MATCHER.assertMatch(created, newRestaurant);
-        RESTAURANT_MATCHER.assertMatch(restaurantRepository.get(newId), newRestaurant);
+        RESTAURANT_MATCHER.assertMatch(restaurantRepository.findById(newId).orElse(null), newRestaurant);
     }
 
     @Test
     void get() {
-        Restaurant actual = restaurantRepository.get(restaurant1.getId());
+        Restaurant actual = restaurantRepository.findById(restaurant1.getId()).orElse(null);
         RESTAURANT_MATCHER.assertMatch(actual, restaurant1);
     }
 
     @Test
     void getNotFound() {
-        assertNull(restaurantRepository.get(NOT_FOUND));
+        assertTrue(restaurantRepository.findById(NOT_FOUND).isEmpty());
     }
 
     @Test
     void update() {
         Restaurant updated = getUpdatedRestaurant();
         restaurantRepository.save(updated);
-        RESTAURANT_MATCHER.assertMatch(restaurantRepository.get(RESTAURANT_START_ID), getUpdatedRestaurant());
+        RESTAURANT_MATCHER.assertMatch(restaurantRepository.findById(RESTAURANT_START_ID).orElse(null),
+                                       getUpdatedRestaurant());
     }
 
     @Test
     void getAll() {
-        RESTAURANT_MATCHER.assertMatch(restaurantRepository.getAll(), restaurants);
+        RESTAURANT_MATCHER.assertMatch(restaurantRepository.findAll(), restaurants);
     }
 
     @Test
     void createWithException() {
-        validateRootCause(() -> restaurantRepository.save(new Restaurant(null, "  ")), ConstraintViolationException.class);
-        validateRootCause(() -> restaurantRepository.save(new Restaurant(null, "")), ConstraintViolationException.class);
+        validateRootCause(ConstraintViolationException.class,
+                          () -> restaurantRepository.save(new Restaurant(null, "  ")));
+        validateRootCause(ConstraintViolationException.class,
+                          () -> restaurantRepository.save(new Restaurant(null, "")));
     }
 }
