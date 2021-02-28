@@ -30,10 +30,10 @@ public class VoteService {
         return save(new Vote(), userId, restId);
     }
 
-    public void update(Vote vote, int userId, int restId, LocalDate day, LocalTime voteTime) {
-        checkNotFoundWithId(voteRepository.getByUserIdAndVoteDate(userId, day), vote.id());
+    public void update(int userId, int restId, LocalDate day, LocalTime voteTime) {
+        Vote vote1 = checkNotFoundWithId(voteRepository.getByUserIdAndVoteDate(userId, day), "Entity not found");
         if (isTimeAvailableForVote(voteTime)) {
-            save(vote, userId, restId);
+            save(vote1, userId, restId);
         } else {
             throw new IllegalRequestDataException("Time to vote is already pass");
         }

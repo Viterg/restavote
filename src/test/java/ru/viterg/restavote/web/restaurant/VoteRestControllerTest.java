@@ -10,7 +10,6 @@ import ru.viterg.restavote.service.VoteService;
 import ru.viterg.restavote.util.DateTimeUtil;
 import ru.viterg.restavote.util.exception.NotFoundException;
 import ru.viterg.restavote.web.AbstractControllerTest;
-import ru.viterg.restavote.web.json.JsonUtil;
 
 import java.time.*;
 
@@ -46,9 +45,7 @@ class VoteRestControllerTest extends AbstractControllerTest {
     }
 
     private void update(ResultMatcher status) throws Exception {
-        perform(MockMvcRequestBuilders.put(REST_URL + "{id}", RESTAURANT_START_ID + 1, DISH_START_ID + 6)
-                                      .contentType(MediaType.APPLICATION_JSON)
-                                      .content(JsonUtil.writeValue(getUpdatedVote()))
+        perform(MockMvcRequestBuilders.put(REST_URL, RESTAURANT_START_ID + 1)
                                       .with(userHttpBasic(user1)))
                 .andExpect(status);
     }
@@ -56,7 +53,7 @@ class VoteRestControllerTest extends AbstractControllerTest {
     @Test
     void getVote() throws Exception {
         Vote expected = makeNewVote();
-        perform(MockMvcRequestBuilders.get(REST_URL + "{id}", RESTAURANT_START_ID + 1, DISH_START_ID + 6)
+        perform(MockMvcRequestBuilders.get(REST_URL, RESTAURANT_START_ID + 1)
                                       .with(userHttpBasic(user1)))
                 .andExpect(status().isOk())
                 .andDo(print())
