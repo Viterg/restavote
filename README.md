@@ -1,4 +1,6 @@
 # RestaVote
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/1c56ebeca0f44ed080c1b446c313113d)](https://www.codacy.com/gh/Viterg/restavote/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Viterg/restavote&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/Viterg/restavote.svg?branch=master)](https://travis-ci.org/Viterg/restavote)
 #### Voting system for deciding where to have lunch.
 
 REST API using Hibernate/Spring/SpringMVC without frontend.
