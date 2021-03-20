@@ -5,10 +5,10 @@ import ru.viterg.restavote.HasId;
 public abstract class BaseTo implements HasId {
     protected Integer id;
 
-    public BaseTo() {
+    protected BaseTo() {
     }
 
-    public BaseTo(Integer id) {
+    protected BaseTo(Integer id) {
         this.id = id;
     }
 

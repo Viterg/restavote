@@ -23,7 +23,7 @@ public class RestaurantRepositoryTest extends AbstractDataManageTest {
 
     @Test
     void deleteNotFound() {
-        assertFalse(restaurantRepository.delete(NOT_FOUND) != 0);
+        assertEquals(0, restaurantRepository.delete(NOT_FOUND));
     }
 
     @Test

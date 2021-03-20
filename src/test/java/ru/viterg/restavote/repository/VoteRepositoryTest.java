@@ -60,7 +60,7 @@ class VoteRepositoryTest extends AbstractDataManageTest {
 
     @Test
     void deleteNotFound() {
-        assertFalse(repository.delete(NOT_FOUND, vote1.getVoteDate()) != 0);
+        assertEquals(0 , repository.delete(NOT_FOUND, vote1.getVoteDate()));
     }
 
     @Test

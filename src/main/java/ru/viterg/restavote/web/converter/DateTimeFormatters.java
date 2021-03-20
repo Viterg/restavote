@@ -9,7 +9,10 @@ import java.util.Locale;
 
 import static ru.viterg.restavote.util.DateTimeUtil.*;
 
-public class DateTimeFormatters {
+public final class DateTimeFormatters {
+    private DateTimeFormatters() {
+    }
+
     public static class LocalDateFormatter implements Formatter<LocalDate> {
 
         @Override

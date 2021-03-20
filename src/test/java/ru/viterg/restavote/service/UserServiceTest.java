@@ -31,8 +31,8 @@ public class UserServiceTest extends AbstractDataManageTest {
 
     @Test
     void duplicateMailCreate() {
-        assertThrows(DataAccessException.class, () ->
-                service.create(new User(null, "Duplicate", "user1@yandex.ru", "newPass", Role.USER)));
+        User user = new User(null, "Duplicate", "user1@yandex.ru", "newPass", Role.USER);
+        assertThrows(DataAccessException.class, () -> service.create(user));
     }
 
     @Test

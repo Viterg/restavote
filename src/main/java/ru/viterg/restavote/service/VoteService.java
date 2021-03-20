@@ -26,10 +26,12 @@ public class VoteService {
         this.restaurantRepository = restaurantRepository;
     }
 
+    @Transactional
     public Vote create(int userId, int restId) {
         return save(new Vote(), userId, restId);
     }
 
+    @Transactional
     public void update(int userId, int restId, LocalDate day, LocalTime voteTime) {
         Vote vote1 = checkNotFoundWithId(voteRepository.getByUserIdAndVoteDate(userId, day), "Entity not found");
         if (isTimeAvailableForVote(voteTime)) {

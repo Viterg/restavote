@@ -78,9 +78,9 @@ public class ValidationUtil {
                                                ErrorType errorType) {
         Throwable rootCause = getRootCause(e);
         if (logStackTrace) {
-            log.error(errorType + " at request " + req.getRequestURL(), rootCause);
+            log.error("{} at request {}", errorType, req.getRequestURL(), rootCause);
         } else {
-            log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
+            log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause);
         }
         return rootCause;
     }

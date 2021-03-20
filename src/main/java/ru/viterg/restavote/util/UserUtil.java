@@ -6,7 +6,9 @@ import ru.viterg.restavote.model.Role;
 import ru.viterg.restavote.model.User;
 import ru.viterg.restavote.to.UserTo;
 
-public class UserUtil {
+public final class UserUtil {
+    private UserUtil() {
+    }
 
     public static User createNewFromTo(UserTo userTo) {
         return new User(null, userTo.getName(), userTo.getEmail().toLowerCase(), userTo.getPassword(), Role.USER);

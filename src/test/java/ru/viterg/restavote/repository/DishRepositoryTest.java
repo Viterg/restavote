@@ -26,12 +26,12 @@ public class DishRepositoryTest extends AbstractDataManageTest {
 
     @Test
     void deleteNotFound() {
-        assertFalse(dishRepository.delete(NOT_FOUND, restaurant1.getId()) != 0);
+        assertEquals(0, dishRepository.delete(NOT_FOUND, restaurant1.getId()));
     }
 
     @Test
     void deleteNotOwn() {
-        assertFalse(dishRepository.delete(dish1.getId(), restaurant3.getId()) != 0);
+        assertEquals(0, dishRepository.delete(dish1.getId(), restaurant3.getId()));
     }
 
     @Test

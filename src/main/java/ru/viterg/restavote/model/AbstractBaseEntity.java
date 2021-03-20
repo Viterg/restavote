@@ -33,6 +33,7 @@ public abstract class AbstractBaseEntity implements HasId {
     }
 
     // doesn't work for hibernate lazy proxy
+    @Override
     public int id() {
         Assert.notNull(id, "Entity must have id");
         return id;
